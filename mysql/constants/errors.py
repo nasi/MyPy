@@ -1,5 +1,5 @@
 """
-Erros
+Errors
 """
 
 ER_HASHCHK = 1000
