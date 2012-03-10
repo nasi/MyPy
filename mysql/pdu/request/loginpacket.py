@@ -1,0 +1,4 @@
+
+
+class LoginPacket(object):
+    pass

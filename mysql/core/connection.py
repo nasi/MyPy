@@ -1,9 +1,11 @@
 import socket
+import struct
 
 from mysql import pdu
 from mysql.core.cursor import Cursor
 from mysql.core.exceptions import OperationalError, ProgrammingError
 from mysql.constants import connectionerrors
+
 
 class Connection(object):
     
@@ -41,7 +43,30 @@ class Connection(object):
         self._wfile.write(packet.to_data())
         self._wfile.flush()
     
+    def _recv(self, packetclass):
+        header = self._rfile.read(4)
+        if len(header) < 4:
+            raise OperationalError(connectionerrors.CR_SERVER_LOST,
+                                   "Lost connection to MySQL server during query")
+        length = struct.unpack('<I', header[:3] + chr(0))[0]
+        data = self._rfile.read(length)
+        if len(data) < length:
+            raise OperationalError(connectionerrors.CR_SERVER_LOST,
+                                   "Lost connection to MySQL server during query")
+        return packetclass().from_data(data)
+    
     def _get_result(self):
+        pass
+    
+    def _handshake(self):
+        self._greeting()         # From server to client during initial handshake
+        self._authentication()   # From client to server during initial handshake
+    
+    def _greeting(self):
+        packet = self._recv(pdu.GreetingPacket)
+        packet.hexdump()
+    
+    def _authentication(self):
         pass
     
     def _connect(self, host, port, unix_socket, connect_timeout):
@@ -62,6 +87,7 @@ class Connection(object):
             self._rfile = self._socket.makefile('rb')
             self._wfile = self._socket.makefile('wb')
                 
+            self._handshake()
         except socket.error, e:
             raise OperationalError(connectionerrors.CR_CONN_HOST_ERROR,
                                    "Can't connect to MySQL server on %r (%s)" % (host, e.args[0]))
