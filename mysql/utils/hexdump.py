@@ -1,3 +1,9 @@
+"""
+Hexdump for Packets
+
+Snippets from http://code.activestate.com/recipes/142812-hex-dumper/
+"""
+
 FILTER=''.join([(len(repr(chr(x)))==3) and chr(x) or '.' for x in range(256)])
 
 def hexdump(src, length=0x10):

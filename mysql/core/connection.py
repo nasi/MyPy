@@ -9,6 +9,8 @@ from mysql.constants import connectionerrors
 
 class Connection(object):
     
+    DEBUG = True
+    
     def __init__(self, host='localhost', user=None, passwd='', db=None, port=3306,
                  unix_socket=None, charset='', cursorclass=Cursor, connect_timeout=None):
         self._connect(host, port, unix_socket, connect_timeout)
@@ -42,6 +44,8 @@ class Connection(object):
         packet = packetclass(*args, **kwargs)
         self._wfile.write(packet.to_data())
         self._wfile.flush()
+        if self.DEBUG:
+            packet.hexdump()
     
     def _recv(self, packetclass):
         header = self._rfile.read(4)
@@ -53,7 +57,10 @@ class Connection(object):
         if len(data) < length:
             raise OperationalError(connectionerrors.CR_SERVER_LOST,
                                    "Lost connection to MySQL server during query")
-        return packetclass().from_data(data)
+        packet = packetclass().from_data(data)
+        if self.DEBUG:
+            packet.hexdump()
+        return packet
     
     def _get_result(self):
         pass
@@ -64,7 +71,6 @@ class Connection(object):
     
     def _greeting(self):
         packet = self._recv(pdu.GreetingPacket)
-        packet.hexdump()
     
     def _authentication(self):
         pass
