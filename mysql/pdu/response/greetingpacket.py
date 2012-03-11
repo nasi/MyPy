@@ -14,6 +14,6 @@ class GreetingPacket(Packet):
         length = 4 + 8 + 1 + 2 + 1 + 2
         self.thread_id, self.scramble_buff, _, self.server_capabilities, \
             self.server_language, self.server_status = struct.unpack(fmt, data[:length])
-        self.salt = data[length + 13:].split(chr(0), 1)[0]
+        self.salt = self.scramble_buff + data[length + 13:].split(chr(0), 1)[0]
         
         return self

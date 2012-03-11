@@ -1,22 +1,37 @@
 from mysql import pdu
 from mysql.core.cursor import Cursor
 from mysql.core.transport import Transport
+from mysql.constants import client
 
 
 class Connection(object):
         
-    def __init__(self, host='localhost', user=None, passwd='', db=None, port=3306,
-                 unix_socket=None, charset='', cursorclass=Cursor, connect_timeout=None):
-        self.transport = Transport(host, port, unix_socket)
-        self.transport.connect(connect_timeout, self._handshake)
-        
+    def __init__(self, host='localhost', user='', passwd='', db=None, port=3306,
+                 unix_socket=None, charset='', client_flag=0, cursorclass=Cursor,
+                 connect_timeout=None):
         self.charset = 'utf8'
+        self.charset_number = 33 # 'utf8'
         self.cursorclass = cursorclass
-    
+
+        self.username = user.encode(self.charset)
+        self.password = passwd.encode(self.charset)
+        self.db = db and db.encode(self.charset) or None
+        
+        self.client_flag = client_flag
+        self.client_flag |= client.CLIENT_CAPABILITIES
+        self.client_flag |= client.CLIENT_MULTI_STATEMENTS
+        if db is not None:
+            self.client_flag |= client.CLIENT_CONNECT_WITH_DB
+
+        self.transport = Transport(host, port, unix_socket)
+        self.transport.connect(connect_timeout, callback=self._handshake)
+                
     def cursor(self, cursorclass=None):
         return (cursorclass or self.cursorclass)(self)
     
     def close(self):
+        if self.transport.is_alive():
+            self.transport.send(pdu.QuitPacket)
         self.transport.disconnect()
         
     def query(self, sql):
@@ -33,11 +48,12 @@ class Connection(object):
         pass
     
     def _handshake(self):
-        self._greeting()         # From server to client during initial handshake
-        self._authentication()   # From client to server during initial handshake
-    
-    def _greeting(self):
-        packet = self.transport.receive(pdu.GreetingPacket)
-    
-    def _authentication(self):
-        pass
+        packet0 = self.transport.receive(pdu.GreetingPacket)
+        
+        if packet0.server_version.startswith('5'):
+            self.client_flag |= client.CLIENT_MULTI_RESULTS
+        
+        self.transport.send(pdu.LoginPacket, self.username, self.password,
+                            self.db, self.charset_number, packet0.salt, self.client_flag)
+        
+        packet1 = self.transport.receive(pdu.ResultPacket)

@@ -1,7 +1,6 @@
 import socket
 import struct
 
-from mysql import pdu
 from mysql.core.exceptions import OperationalError, ProgrammingError
 from mysql.constants import connectionerrors
 
@@ -43,13 +42,14 @@ class Transport(object):
 
     def disconnect(self):
         if self._socket is not None:
-            self.send(pdu.QuitPacket)
-            
             for obj in (self._wfile, self._rfile, self._socket):
                 obj.close()
             self._socket = self._rfile = self._wfile = None
         else:
             raise ProgrammingError("Closing a closed connection")
+
+    def is_alive(self):
+        return self._socket is not None
     
     def send(self, packetclass, *args, **kwargs):
         packet = packetclass(*args, **kwargs)
