@@ -45,7 +45,16 @@ class Connection(object):
         return sql
     
     def _get_result(self):
-        pass
+        header_packet = self.transport.receive(pdu.ResultSetPacket)
+        for _ in xrange(header_packet.field_count):
+            field_packet = self.transport.receive(pdu.FieldPacket)
+        packet = self.transport.receive(pdu.ResultPacket)
+        assert isinstance(packet, pdu.EofPacket)
+        
+        packet = self.transport.receive(pdu.ResultPacket)
+        while not isinstance(packet, pdu.EofPacket):
+            print packet.columns
+            packet = self.transport.receive(pdu.ResultPacket)
     
     def _handshake(self):
         packet0 = self.transport.receive(pdu.GreetingPacket)
@@ -57,3 +66,7 @@ class Connection(object):
                             self.db, self.charset_number, packet0.salt, self.client_flag)
         
         packet1 = self.transport.receive(pdu.ResultPacket)
+        if isinstance(packet1, pdu.OkPacket):
+            pass
+        else:
+            pass # error

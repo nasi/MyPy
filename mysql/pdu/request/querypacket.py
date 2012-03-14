@@ -1,8 +1,9 @@
 import struct
+from mysql.pdu.base import Packet
 from mysql.constants.commands import COM_QUERY
 
 
-class QueryPacket(object):
+class QueryPacket(Packet):
     
     def __init__(self, sql):
         self.sql  = sql

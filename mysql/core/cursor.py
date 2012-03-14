@@ -1,11 +1,13 @@
+from weakref import proxy
+
 
 class Cursor(object):
     
     def __init__(self, connection):
-        self.connection = connection
+        self.connection = proxy(connection)
         
     def close(self):
-        pass
+        self.connection = None
     
     def execute(self, query, args=None):
-        pass
+        self.connection.query(query)
