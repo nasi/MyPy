@@ -1,4 +1,5 @@
 from mysql.pdu.base import Packet
+from mysql.core.conversion import conversions
 
 class RowDataPacket(Packet):
     
@@ -15,3 +16,16 @@ class RowDataPacket(Packet):
             self.columns.append(column)
         
         return self
+    
+    def converted_columns(self, fields):
+        new_columns = []
+        for column, field in zip(self.columns, fields):
+            cast = conversions[field[1]]
+            if column is None:
+                new_columns.append(None)
+            elif cast != unicode:
+                new_columns.append(cast(column))
+            else:
+                new_columns.append(cast(column.decode('utf-8')))
+
+        return new_columns

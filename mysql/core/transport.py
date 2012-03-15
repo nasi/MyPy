@@ -8,7 +8,7 @@ from mysql.constants import connectionerrors
 class Transport(object):
     
     LOCALHOST = ('localhost', '127.0.0.1')
-    DEBUG = True
+    DEBUG = False
     
     def __init__(self, host, port, unix_socket=None):
         self.host = host

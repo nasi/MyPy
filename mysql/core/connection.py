@@ -36,25 +36,27 @@ class Connection(object):
         
     def query(self, sql):
         self.transport.send(pdu.QueryPacket, self._encode(sql))
-        self.affected_rows = self._get_result()
-        return self.affected_rows
     
     def _encode(self, sql):
         if isinstance(sql, unicode):
             return sql.encode(self.charset)
         return sql
     
-    def _get_result(self):
+    def get_result(self):
         header_packet = self.transport.receive(pdu.ResultSetPacket)
+        fields = []
         for _ in xrange(header_packet.field_count):
             field_packet = self.transport.receive(pdu.FieldPacket)
+            fields.append((field_packet.name, field_packet.type))
         packet = self.transport.receive(pdu.ResultPacket)
         assert isinstance(packet, pdu.EofPacket)
         
+        rows = []
         packet = self.transport.receive(pdu.ResultPacket)
         while not isinstance(packet, pdu.EofPacket):
-            print packet.columns
+            rows.append(tuple(packet.converted_columns(fields)))
             packet = self.transport.receive(pdu.ResultPacket)
+        return rows
     
     def _handshake(self):
         packet0 = self.transport.receive(pdu.GreetingPacket)

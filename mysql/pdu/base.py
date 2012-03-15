@@ -11,5 +11,7 @@ class Packet(object):
     def to_data(self):
         return self.data
     
-    def hexdump(self):
-        print hexdump(self.data)
+    def hexdump(self, data=None):
+        if data is None:
+            data = self.data
+        print hexdump(data)
