@@ -1,7 +1,7 @@
 """
 Base Class for Packets
 """
-from mysql.utils.hexdump import hexdump
+from MyPy.utils.hexdump import hexdump
 
 
 class Packet(object):

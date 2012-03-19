@@ -1,5 +1,5 @@
-from mysql.constants import fieldtypes
-from mysql.utils.times import mysql_timestamp_converter, Date_or_None, DateTime_or_None, TimeDelta_or_None
+from MyPy.constants import fieldtypes
+from MyPy.utils.times import mysql_timestamp_converter, Date_or_None, DateTime_or_None, TimeDelta_or_None
 
 str2set = lambda s: set([i for i in s.split(',') if i])
 

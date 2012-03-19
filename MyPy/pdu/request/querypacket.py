@@ -1,6 +1,6 @@
 import struct
-from mysql.pdu.base import Packet
-from mysql.constants.commands import COM_QUERY
+from MyPy.pdu.base import Packet
+from MyPy.constants.commands import COM_QUERY
 
 
 class QueryPacket(Packet):

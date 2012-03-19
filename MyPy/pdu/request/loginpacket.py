@@ -6,8 +6,8 @@ except ImportError:
     import sha
     sha1 = sha.new
     
-from mysql.pdu.base import Packet
-from mysql.utils.crypto import scramble
+from MyPy.pdu.base import Packet
+from MyPy.utils.crypto import scramble
 
 
 class LoginPacket(Packet):

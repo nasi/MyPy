@@ -1,5 +1,5 @@
-from mysql.pdu.base import Packet
-from mysql.core.conversion import conversions
+from MyPy.pdu.base import Packet
+from MyPy.core.conversion import conversions
 
 class RowDataPacket(Packet):
     

@@ -1,7 +1,7 @@
-from mysql import pdu
-from mysql.core.cursor import Cursor
-from mysql.core.transport import Transport
-from mysql.constants import client
+from MyPy import pdu
+from MyPy.core.cursor import Cursor
+from MyPy.core.transport import Transport
+from MyPy.constants import client
 
 
 class Connection(object):

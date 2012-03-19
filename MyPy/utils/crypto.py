@@ -1,4 +1,4 @@
-from mysql.utils.hashcompat import sha_constructor
+from MyPy.utils.hashcompat import sha_constructor
 
 
 def scramble(password, salt):

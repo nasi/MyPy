@@ -1,4 +1,4 @@
-from mysql.pdu.base import Packet
+from MyPy.pdu.base import Packet
 
 class OkPacket(Packet):
     

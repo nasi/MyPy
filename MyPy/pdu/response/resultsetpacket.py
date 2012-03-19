@@ -1,5 +1,5 @@
 import struct
-from mysql.pdu.base import Packet
+from MyPy.pdu.base import Packet
 
 class ResultSetPacket(Packet):
     

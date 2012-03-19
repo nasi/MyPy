@@ -1,8 +1,8 @@
 import socket
 import struct
 
-from mysql.core.exceptions import OperationalError, ProgrammingError
-from mysql.constants import connectionerrors
+from MyPy.core.exceptions import OperationalError, ProgrammingError
+from MyPy.constants import connectionerrors
 
 
 class Transport(object):
