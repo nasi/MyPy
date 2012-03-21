@@ -72,3 +72,10 @@ class Connection(object):
             pass
         else:
             pass # error
+        
+        
+    def commit(self):
+        pass
+    
+    def rollback(self):
+        pass
